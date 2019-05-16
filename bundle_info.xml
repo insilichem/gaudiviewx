@@ -1,0 +1,53 @@
+<!--
+ChimeraX bundle names must start with "ChimeraX-"
+to avoid clashes with package names in pypi.python.org.
+When uploaded to the ChimeraX toolshed, the bundle
+will be displayed without the ChimeraX- prefix.
+-->
+
+<BundleInfo name="GaudiViewX"
+	    version="0.1" package="chimerax.gaudiviewx"
+  	    minSessionVersion="1" maxSessionVersion="1">
+
+  <!-- Additional information about bundle source -->
+  <Author>Andrés Giner Antón</Author>
+  <Email>andresgineranton@outlook.com</Email>
+  <URL>https://github.com/andresginera/gaudiviewx/</URL>
+
+  <!-- Synopsis is a one-line description
+       Description is a full multi-line description -->
+  <Synopsis>Graphical interface to explore, view and analyze solutions from GaudiMM inside UCSF ChimeraX</Synopsis>
+  <Description>Graphical interface for GaudiMM solutions.
+
+This UCSF ChimeraX bundle is an improvement of the package
+GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
+  </Description>
+
+  <!-- Categories is a list where this bundle should appear -->
+  <Categories>
+    <Category name="Insilichem"/>
+  </Categories>
+
+  <!-- Dependencies on other ChimeraX/Python packages -->
+  <!-- This example uses functionality from the Tutorial_Command bundle -->
+  <Dependencies>
+    <Dependency name="ChimeraX-Core" version=">=0.1"/>
+    <Dependency name="ChimeraX-UI" version=">=1.0"/>
+  </Dependencies>
+
+  <!-- Non-Python files that are part of package -->
+  <DataFiles>
+    <DataFile>docs/user/tools/tutorial.html</DataFile>
+  </DataFiles>
+
+  <Classifiers>
+    <!-- Development Status should be compatible with bundle version number -->
+    <PythonClassifier>Development Status :: 3 - Alpha</PythonClassifier>
+    <PythonClassifier>License :: Freeware</PythonClassifier>
+    <!-- ChimeraX classifiers describe supplied functionality -->
+    <!-- Register a graphical interface tool -->
+    <ChimeraXClassifier>ChimeraX :: Tool :: GaudiViewX ::
+      Insilichem :: Graphical interface example</ChimeraXClassifier>
+  </Classifiers>
+
+</BundleInfo>
