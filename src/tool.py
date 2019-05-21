@@ -12,8 +12,17 @@
 # === UCSF ChimeraX Copyright ===
 
 import sys
+import yaml
 from chimerax.core.tools import ToolInstance
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt, QSize, pyqtSignal, QTimer
+from PyQt5.QtCore import (
+    QAbstractTableModel,
+    QVariant,
+    Qt,
+    QSize,
+    pyqtSignal,
+    QTimer,
+    QModelIndex,
+)
 from PyQt5.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -27,7 +36,7 @@ from PyQt5.QtWidgets import (
     QMenuBar,
 )
 from PyQt5 import QtGui
-from . import gui
+from . import gui, gaudireader
 
 
 class GaudiViewXTool(ToolInstance):
@@ -99,83 +108,95 @@ class GaudiViewXTool(ToolInstance):
         vbox = QVBoxLayout()
         data = gui.BrowserFile().path
 
-        # data = load_data(vbox.addWidget(QLabel(BrowserFile().path)))
         #####################################
 
-        vbox.addWidget(gui.MyToolBar())
-        vbox.addWidget(gui.MainWindow(data, self.session))
+        if data:
 
-        # Box bottons
-        box_layout = QHBoxLayout()
-        box_layout.addStretch(1)
+            self.table = gui.MainWindow(data, self.session)
+            vbox.addWidget(gui.MyToolBar(self.table, self.session))
+            vbox.addWidget(self.table)
 
-        add_butn = QPushButton("Add...")
-        addFile = add_butn.clicked.connect(gui.BrowserFile)
-        add_butn.setFont(QtGui.QFont("Helvetica", 11))
-        box_layout.addWidget(add_butn)
+            # Box bottons
+            box_layout = QHBoxLayout()
+            box_layout.addStretch(1)
 
-        self.delete_butn = QPushButton("Delete")
-        self.delete_butn.setEnabled(False)
-        self.delete_butn.setFont(QtGui.QFont("Helvetica", 11))
-        box_layout.addWidget(self.delete_butn)
+            add_butn = QPushButton("Add...")
+            add_butn.clicked.connect(self.add_new_data)
+            add_butn.setFont(QtGui.QFont("Helvetica", 11))
+            box_layout.addWidget(add_butn)
 
-        reset_butn = QPushButton("Reset")
-        reset_butn.setFont(QtGui.QFont("Helvetica", 11))
-        box_layout.addWidget(reset_butn)
+            self.delete_butn = QPushButton("Delete")
+            self.delete_butn.setEnabled(False)
+            self.delete_butn.setFont(QtGui.QFont("Helvetica", 11))
+            self.delete_butn.clicked.connect(self.remove_selected_rows)
 
-        box_layout.addStretch(1)
+            self.selection = self.table.selectionModel()
+            self.selection.selectionChanged.connect(self.activate_delete_button)
 
-        vbox.addLayout(box_layout)
+            box_layout.addWidget(self.delete_butn)
 
-        # Image copyright
+            reset_butn = QPushButton("Reset")
+            reset_butn.setFont(QtGui.QFont("Helvetica", 11))
+            reset_butn.clicked.connect(self.reset_changes)
+            box_layout.addWidget(reset_butn)
 
-        copy_layout = QHBoxLayout()
-        copy_layout.addStretch(1)
-        # Botton
-        insl_butn = gui.QLabelClickable()
-        insl_butn.setGeometry(15, 15, 118, 130)
-        insl_butn.setToolTip("Imagen")
-        insl_butn.setCursor(Qt.PointingHandCursor)
+            box_layout.addStretch(1)
 
-        copy_layout.addWidget(insl_butn)
-        pixmapImagen = QtGui.QPixmap(
-            "/home/andres/practicas/chimerax/tut_tool_qt/src/insilichem.png"
-        ).scaled(112, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        insl_butn.setPixmap(pixmapImagen)
-        insl_butn.setAlignment(Qt.AlignCenter)
-        # Label
-        insl_label_layout = QVBoxLayout()
-        insl_label_layout.addSpacing(10)
-        insl_label0 = QLabel("Insilichem")
-        insl_label0.setFont(QtGui.QFont("Helvetica", 20))
-        insl_label0.setStyleSheet("color:rgb(18,121,90)")
-        insl_label_layout.addWidget(insl_label0)
-        insl_label_layout.addSpacing(5)
+            vbox.addLayout(box_layout)
+            vbox.addSpacing(25)
 
-        insl_label1 = QLabel(
-            'Developed by <a href="https://github.com/andresginera/">@andresginera</a>'
-        )
-        insl_label1.setOpenExternalLinks(True)
-        insl_label1.setFont(QtGui.QFont("Helvetica", 12))
-        insl_label_layout.addWidget(insl_label1)
+            vbox.addLayout(gui.LogoCopyright())
 
-        insl_label2 = QLabel("at Maréchal Group, UAB, Spain")
-        insl_label2.setFont(QtGui.QFont("Helvetica", 12))
-        insl_label_layout.addWidget(insl_label2)
-        insl_label_layout.addStretch(1)
+            #######################
 
-        copy_layout.addLayout(insl_label_layout)
+            self.tool_window.ui_area.setLayout(vbox)
 
-        copy_layout.addStretch(1)
-        vbox.addLayout(copy_layout)
+            # Show the window on the user-preferred side of the ChimeraX
+            # main window
+            self.tool_window.manage("side")
 
-        #######################
+        else:
 
-        self.tool_window.ui_area.setLayout(vbox)
+            self.tool_window.destroy()
 
-        # Show the window on the user-preferred side of the ChimeraX
-        # main window
-        self.tool_window.manage("side")
+    def add_new_data(self):
+
+        self.add_file = None
+        self.add_file = gui.BrowserFile().path
+        if self.add_file:
+            with open(self.add_file, "r") as f:
+                data = yaml.safe_load(f)
+            self.new_arraydata = [[k] + v for k, v in data["GAUDI.results"].items()]
+            new_headerdata = ["Filename"] + data["GAUDI.objectives"]
+            self.new_headerdata = list(
+                map(lambda text: text.replace(" (", "\n("), new_headerdata)
+            )
+            if self.new_headerdata == self.table.tm.headerdata:
+                self.table.tm.layoutAboutToBeChanged.emit()
+                self.table.tm.arraydata = self.table.tm.arraydata + self.new_arraydata
+                self.table.tm.layoutChanged.emit()
+            else:
+                mesbox = QMessageBox()
+                mesbox.setIcon(QMessageBox.Warning)
+                mesbox.setText(
+                    "The objectives of the new file are not the same as the original output file."
+                )
+                mesbox.setStandardButtons(QMessageBox.Ok)
+                mesbox.exec()
+
+    def reset_changes(self):
+        self.table.tm.layoutAboutToBeChanged.emit()
+        self.table.tm.arraydata = self.table.tm.backdoor
+        self.table.tm.layoutChanged.emit()
+
+    def activate_delete_button(self, selected):
+        if self.delete_butn.isEnabled() == False:
+            self.delete_butn.setEnabled(True)
+
+    def remove_selected_rows(self):
+        indexes = self.table.selectionModel().selectedRows()
+
+        self.table.tm.removeRows(indexes[0].row(), len(indexes))
 
     def return_pressed(self):
         # The use has pressed the Return key; log the current text as HTML

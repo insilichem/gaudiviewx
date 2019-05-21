@@ -11,8 +11,6 @@ class GaudiModel(object):
         self.path = path
         self.basedir = os.path.dirname(path)
         self.data, self.headers, self.keys = self.parse()
-        self.metadata = {}
-        self.molecules = {}
         self.tempdir = tempfile.mkdtemp("gaudiviewx")
         self.session = session
 
@@ -22,7 +20,7 @@ class GaudiModel(object):
         datarray = [[k] + v for k, v in data["GAUDI.results"].items()]
         keys = data["GAUDI.results"].keys()
         header = ["Filename"] + list(
-            map(lambda text: text.replace(" (", "\n("), data["GAUDI.results"])
+            map(lambda text: text.split()[0], data["GAUDI.results"])
         )
         return datarray, header, keys
 
@@ -58,9 +56,8 @@ class GaudiModel(object):
 
     def save_models(self):
         modelsdict = {}
-     
+
         for key in self.keys:
             models = self.parse_zip(os.path.join(self.basedir, key))
             modelsdict[key] = models
         return modelsdict
-

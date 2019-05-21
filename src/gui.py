@@ -3,7 +3,17 @@ import os
 import re
 import sys
 import yaml
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt, QSize, pyqtSignal, QTimer
+import webbrowser
+import copy
+from PyQt5.QtCore import (
+    QAbstractTableModel,
+    QVariant,
+    Qt,
+    QSize,
+    pyqtSignal,
+    QTimer,
+    QModelIndex,
+)
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QTableView,
@@ -21,18 +31,13 @@ from PyQt5.QtWidgets import (
     QAbstractButton,
     QLabel,
 )
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QMouseEvent
 from PyQt5 import QtGui
 import chimerax.core.io
 import chimerax.core.session
 from chimerax.ui import MainToolWindow
-import weakref
 from . import gaudireader
 from chimerax.core.commands import run, concise_model_spec
-
-
-def show(models, session):
-    run(session, "show %s target m" % concise_model_spec(session, models))
 
 
 class MainWindow(QTableView):
@@ -41,15 +46,14 @@ class MainWindow(QTableView):
 
         self.path = os.path.dirname(datain)
         self.session = session
-        self.models_active = []
 
         # create the view
 
         # set the table model
-        tm = MyTableModel(datain, self)
-        self.setModel(tm)
+        self.tm = MyTableModel(datain, self)
+        self.setModel(self.tm)
         # set the minimum size
-        self.setMinimumSize(400, 400)
+        self.setMinimumSize(400, 300)
 
         # hide grid
         self.setShowGrid(True)
@@ -69,7 +73,7 @@ class MainWindow(QTableView):
         self.hh = self.horizontalHeader()
         self.hh.setHighlightSections(False)
         # hh.setStretchLastSection(True)
-        self.hh.setSectionResizeMode(QHeaderView.Stretch)
+        # self.hh.setSectionResizeMode(QHeaderView.Stretch)
 
         # set column width to fit contents
         self.resizeColumnsToContents()
@@ -82,34 +86,16 @@ class MainWindow(QTableView):
         # enable sorting
         self.setSortingEnabled(True)
 
-        self.models = tm.models
+        self.models = self.tm.models
 
     def handleSelectionChanged(self, selected, deselected):
 
-        from chimerax.core.commands import run, concise_model_spec
-
-        name_selected = [
-            selected.indexes()[i]
-            for i in range(
-                0, len(selected.indexes()) - (len(self.hh) - 1), len(self.hh)
-            )
-        ]
-        selection = [self.models[index.data()] for index in name_selected]
-
-        name_deselected = [
-            deselected.indexes()[i]
-            for i in range(
-                0, len(deselected.indexes()) - (len(self.hh) - 1), len(self.hh)
-            )
-        ]
-        deselection = [self.models[index.data()] for index in name_deselected]
+        selection = retrieve_models(selected, self.hh, self.models)
+        deselection = retrieve_models(deselected, self.hh, self.models)
 
         if deselection:
             for model in deselection:
-                run(
-                    self.session,
-                    "hide %s target m" % concise_model_spec(self.session, model),
-                )
+                hide(self.session, model)
 
         for model in selection:
             if not all(
@@ -118,26 +104,40 @@ class MainWindow(QTableView):
             ):
                 self.session.models.add(model)
             else:
-                run(
-                    self.session,
-                    "show %s target m" % concise_model_spec(self.session, model),
-                )
+                show(self.session, model)
+
+
+def retrieve_models(selected, header, models):
+
+    names = [
+        selected.indexes()[i]
+        for i in range(0, len(selected.indexes()) - (len(header) - 1), len(header))
+    ]
+    selection = [models[index.data()] for index in names]
+
+    return selection
+
+
+def show(session, models):
+    run(session, "show %s target m" % concise_model_spec(session, models))
+
+
+def hide(session, models):
+    run(session, "hide %s target m" % concise_model_spec(session, models))
 
 
 class MyTableModel(QAbstractTableModel):
     def __init__(self, data, parent=None, *args):
-        """ datain: a list of lists
-            headerdata: a list of strings
-        """
         with open(data, "r") as f:
             datain = yaml.load(f)
         QAbstractTableModel.__init__(self, parent, *args)
         self.arraydata = [[k] + v for k, v in datain["GAUDI.results"].items()]
+        self.backdoor = copy.copy(self.arraydata)
         headerdata = ["Filename"] + datain["GAUDI.objectives"]
         self.headerdata = list(map(lambda text: text.replace(" (", "\n("), headerdata))
 
-        gaudim = gaudireader.GaudiModel(data, parent.session)
-        self.models = gaudim.save_models()
+        self.gaudimodel = gaudireader.GaudiModel(data, parent.session)
+        self.models = self.gaudimodel.save_models()
 
     def rowCount(self, parent):
         return len(self.arraydata)
@@ -166,48 +166,50 @@ class MyTableModel(QAbstractTableModel):
             self.arraydata.reverse()
         self.layoutChanged.emit()
 
+    def removeRows(self, row, rows=1, index=QModelIndex()):
+        self.beginRemoveRows(QModelIndex(), row, row + rows - 1)
+        self.arraydata = self.arraydata[:row] + self.arraydata[row + rows :]
+        self.endRemoveRows()
 
-class QLabelClickable(QLabel):
-    clicked = pyqtSignal(str)
+        return True
 
-    def __init__(self, parent=None):
-        super(QLabelClickable, self).__init__(parent)
+    def insertRows(self, position, rows=1, parent=QModelIndex()):
 
-    def mousePressEvent(self, event):
-        self.ultimo = "Clic"
+        self.beginInsertRows(QModelIndex(), position, position + rows - 1)
+        self.arraydata = self.arraydata[:]
+        self.endInsertRows()
 
-    def mouseReleaseEvent(self, event):
-        if self.ultimo == "Clic":
-            QTimer.singleShot(
-                MainToolWindow.instance().doubleClickInterval(),
-                self.performSingleClickAction,
-            )
-        else:
-            # Realizar acción de doble clic.
-            self.clicked.emit(self.ultimo)
-
-    def mouseDoubleClickEvent(self, event):
-        self.ultimo = "Doble Clic"
-
-    def performSingleClickAction(self):
-        if self.ultimo == "Clic":
-            self.clicked.emit(self.ultimo)
+        return True
 
 
 class MyToolBar(QToolBar):
-    def __init__(self, parent=None, *args):
+    def __init__(self, table, session, parent=None, *args):
         QToolBar.__init__(self, parent, *args)
 
+        self.table = table
+        self.session = session
         self.addAction(QAction(QIcon("icon_folder"), "Open New File", self))
-        print(os.path.abspath("."))
-
         self.addAction(QAction(QIcon("icon_save"), "Save File", self))
 
         self.actionTriggered[QAction].connect(self.toolbtnpressed)
 
     def toolbtnpressed(self, a):
         if a.text() == "Open New File":
-            self.nameFile = BrowserFile()
+            self.nameFile = BrowserFile().path
+            if self.nameFile:
+                self.table.tm.layoutAboutToBeChanged.emit()
+                self.table.tm.removeRows(0, len(self.table.tm.arraydata))
+                self.table.tm = MyTableModel(self.nameFile, self)
+                with open(self.nameFile, "r") as f:
+                    data = yaml.load(f)
+                datarray = [[k] + v for k, v in data["GAUDI.results"].items()]
+                header = ["Filename"] + list(
+                    map(lambda text: text.replace(" (", "\n("), data["GAUDI.results"])
+                )
+                self.table.tm.arraydata = datarray
+                self.table.tm.headerdata = header
+                self.table.tm.layoutChanged.emit()
+                run(self.session, "close")
         elif a.text() == "Save File":
             print("File saved")
 
@@ -215,6 +217,7 @@ class MyToolBar(QToolBar):
 class BrowserFile(QWidget):
     def __init__(self):
         super().__init__()
+        self.path = None
         self.title = "Browser File"
         self.left = 10
         self.top = 10
@@ -240,3 +243,55 @@ class BrowserFile(QWidget):
         if fileName.endswith("gaudi-output"):
             self.path = fileName
 
+
+class LogoCopyright(QHBoxLayout):
+    def __init__(self, parent=None, *args):
+        QHBoxLayout.__init__(self, parent, *args)
+        self.addStretch(1)
+        self.addWidget(self.set_logo())
+        self.addLayout(self.set_label())
+        self.addStretch(1)
+
+    def set_logo(self):
+        logo = QLabelClickable()
+        logo.setToolTip("Insilichem logo")
+        logo.setCursor(Qt.PointingHandCursor)
+        logo.setPixmap(
+            QtGui.QPixmap(
+                "/home/andres/practicas/chimerax/tut_tool_qt/src/insilichem.png"
+            ).scaled(112, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        )
+        logo.setAlignment(Qt.AlignCenter)
+
+        return logo
+
+    def set_label(self):
+        layout = QVBoxLayout()
+
+        label0 = QLabel("Insilichem")
+        label0.setFont(QtGui.QFont("Helvetica", 20))
+        label0.setStyleSheet("color:rgb(18,121,90)")
+        layout.addWidget(label0)
+
+        label1 = QLabel(
+            'Developed by <a href="https://github.com/andresginera/">@andresginera</a>'
+        )
+        label1.setOpenExternalLinks(True)
+        label1.setFont(QtGui.QFont("Helvetica", 12))
+        layout.addWidget(label1)
+
+        label2 = QLabel("at Maréchal Group, UAB, Spain")
+        label2.setFont(QtGui.QFont("Helvetica", 12))
+        layout.addWidget(label2)
+
+        return layout
+
+
+class QLabelClickable(QLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(QLabelClickable, self).__init__(parent)
+
+    def mouseReleaseEvent(self, event):
+        webbrowser.open("https://www.insilichem.com/")
