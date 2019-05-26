@@ -2,6 +2,7 @@ import tempfile
 import zipfile
 import yaml
 import os
+import multiprocessing
 from chimerax.core import models, io
 from chimerax.core.commands import run, concise_model_spec
 
@@ -16,11 +17,12 @@ class GaudiModel(object):
 
     def parse(self):
         with open(self.path, "r") as f:
-            data = yaml.load(f)
-        datarray = [[k] + v for k, v in data["GAUDI.results"].items()]
-        keys = data["GAUDI.results"].keys()
+            self.first_line = f.readline()
+            self.raw_data = yaml.safe_load(f)
+        datarray = [[k] + v for k, v in self.raw_data["GAUDI.results"].items()]
+        keys = list(self.raw_data["GAUDI.results"].keys())
         header = ["Filename"] + list(
-            map(lambda text: text.split()[0], data["GAUDI.results"])
+            map(lambda text: text.split()[0], self.raw_data["GAUDI.objectives"])
         )
         return datarray, header, keys
 
