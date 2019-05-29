@@ -42,6 +42,7 @@ from PyQt5.QtWidgets import (
     QDoubleSpinBox,
     QButtonGroup,
     QFrame,
+    QCheckBox
 )
 from PyQt5.QtGui import QIcon, QPixmap, QMouseEvent, QFont, QPalette, QColor
 from PyQt5 import QtGui
@@ -54,15 +55,16 @@ from chimerax.core.commands import run, concise_model_spec
 
 
 class MainWindow(QTableView):
-    def __init__(self, datain, session, parent=None):
+    def __init__(self, window, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.session = session
+        self.window = window
+        self.session = window.session
         self.setFont(QtGui.QFont("Helvetica", 12))
 
         # create the view
 
         # set the table model
-        self.tm = MyTableModel(datain, self)
+        self.tm = MyTableModel(window.path, self)
         self.models = self.tm.models
         self.setModel(self.tm)
         # set the minimum size
@@ -100,6 +102,8 @@ class MainWindow(QTableView):
         # enable sorting
         self.setSortingEnabled(True)
 
+        print(self.selection.hasSelection())
+
     def handleSelectionChanged(self, selected, deselected):
 
         selection = retrieve_models(selected, self.hh, self.models)
@@ -117,6 +121,7 @@ class MainWindow(QTableView):
                 self.session.models.add(model)
             else:
                 show(self.session, model)
+        self.window.return_pressed()
 
 
 def retrieve_models(selected, header, models):
@@ -378,7 +383,7 @@ class FilterBox(QDialog):
     def not_equal(self):
         new_array = []
         for row in self.toolbar.table.tm.arraydata:
-            if not float(row[self.index_column]) == self.filter_number:
+            if float(row[self.index_column]) != self.filter_number:
                 new_array.append(row)
         self.toolbar.table.tm.arraydata = new_array
 
@@ -559,7 +564,7 @@ class LogoCopyright(QHBoxLayout):
         logo.setPixmap(
             QtGui.QPixmap(
                 "/home/andres/practicas/chimerax/tut_tool_qt/src/insilichem.png"
-            ).scaled(112, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            ).scaled(100, 87.5, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
         logo.setAlignment(Qt.AlignCenter)
 

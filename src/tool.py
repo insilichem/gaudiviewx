@@ -37,6 +37,9 @@ from PyQt5.QtWidgets import (
     QMenuBar,
     QSplitter,
     QFrame,
+    QGroupBox,
+    QCheckBox,
+    QButtonGroup,
 )
 from PyQt5 import QtGui
 from PyQt5.QtGui import QKeySequence
@@ -110,13 +113,13 @@ class GaudiViewXTool(ToolInstance):
         # self.tool_window.ui_area.setLayout(layout)
 
         vbox = QVBoxLayout()
-        data = gui.BrowserFile().path
+        self.path = gui.BrowserFile().path
 
         #####################################
 
-        if data:
+        if self.path:
 
-            self.table = gui.MainWindow(data, self.session)
+            self.table = gui.MainWindow(self)
             vbox.addWidget(gui.MyToolBar(self))
             line = QFrame()
             hbox = QHBoxLayout()
@@ -177,7 +180,17 @@ class GaudiViewXTool(ToolInstance):
 
             hbox.addLayout(box_layout)
             vbox.addLayout(hbox)
-            vbox.addSpacing(25)
+
+            self.command_layout = QHBoxLayout()
+
+            self.line_edit = QLineEdit()
+            self.line_edit.setPlaceholderText("Command Input")
+            self.line_edit.returnPressed.connect(self.return_pressed)
+            self.command_layout.addWidget(self.line_edit)
+            vbox.addSpacing(5)
+
+            vbox.addLayout(self.command_layout)
+            vbox.addSpacing(15)
 
             vbox.addLayout(gui.LogoCopyright())
 
@@ -220,8 +233,12 @@ class GaudiViewXTool(ToolInstance):
 
         self.update_saves()
         self.table.tm.layoutAboutToBeChanged.emit()
-        self.table.tm.arraydata, self.table.tm.headerdata = self.table.tm.backdoor
+        self.table.tm.arraydata = self.table.tm.backdoor[0]
+        self.table.tm.headerdata = self.table.tm.backdoor[1]
         self.table.tm.layoutChanged.emit()
+        nrows = len(self.table.tm.arraydata)
+        for row in range(nrows):
+            self.table.setRowHeight(row, 25)
 
     def activate_delete_button(self, selected):
         if self.delete_butn.isEnabled() == False:
@@ -252,6 +269,10 @@ class GaudiViewXTool(ToolInstance):
 
         self.table.tm.layoutChanged.emit()
 
+        nrows = len(self.table.tm.arraydata)
+        for row in range(nrows):
+            self.table.setRowHeight(row, 25)
+
     def update_saves(self):
 
         self.data_save4 = copy.copy(self.data_save3)
@@ -265,7 +286,7 @@ class GaudiViewXTool(ToolInstance):
         from chimerax.core.commands import run
 
         # ToolInstance has a 'session' attribute...
-        run(self.session, "log html %s" % self.line_edit.text())
+        run(self.session, "%s" % self.line_edit.text())
 
     def fill_context_menu(self, menu, x, y):
         # Add any tool-specific items to the given context menu (a QMenu instance).

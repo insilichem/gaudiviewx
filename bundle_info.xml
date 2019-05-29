@@ -32,8 +32,10 @@ GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
   <!-- This example uses functionality from the Tutorial_Command bundle -->
   <Dependencies>
     <Dependency name="ChimeraX-Core" version=">=0.1"/>
+    <Dependency name="Pyyaml" version=">=5.0"/>
     <Dependency name="ChimeraX-UI" version=">=1.0"/>
   </Dependencies>
+
 
   <!-- Non-Python files that are part of package -->
   <DataFiles>
@@ -47,7 +49,7 @@ GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
     <!-- ChimeraX classifiers describe supplied functionality -->
     <!-- Register a graphical interface tool -->
     <ChimeraXClassifier>ChimeraX :: Tool :: GaudiViewX ::
-      Insilichem :: Graphical interface example</ChimeraXClassifier>
+      Insilichem :: Graphical interface for Gaudi outputs</ChimeraXClassifier>
   </Classifiers>
 
 </BundleInfo>

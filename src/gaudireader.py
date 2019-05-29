@@ -44,15 +44,18 @@ class GaudiModel(object):
                 for name in z.namelist()
                 if name.endswith(".mol2")
             ]
-
-            if len(mol2) > 1:
-                models, status = io.open_multiple_data(
-                    self.session, mol2, format=None, name=name
+            models = []
+            for mol2_file in mol2:
+                if "Protein" in mol2_file:
+                    mol2_name = "Protein_" + name
+                elif "Metal" in mol2_file:
+                    mol2_name = "Metal_" + name
+                elif "Ligand" in mol2_file:
+                    mol2_name = "Ligand_" + name
+                model, _ = io.open_data(
+                    self.session, mol2_file, format=None, name=mol2_name
                 )
-            else:
-                models, status = io.open_data(
-                    self.session, mol2[0], format=None, name=name
-                )
+                models += model
             z.close()
             return models
 

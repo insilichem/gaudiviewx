@@ -11,6 +11,8 @@ GaudiViewX
    :caption: User Guide
 
    description.rst
+   installation.rst
+   manual.rst
 
 
 
