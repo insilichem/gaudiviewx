@@ -1,5 +1,3 @@
-<html>
-
 <!--
 === UCSF ChimeraX Copyright ===
 Copyright 2018 Regents of the University of California.
@@ -13,43 +11,58 @@ or derivations thereof.
 === UCSF ChimeraX Copyright ===
 -->
 
-<head>
-	<link rel="stylesheet" type="text/css" href="../userdocs.css" />
-	<title>Tool: GaudiViewX (Insilichem)</title>
-</head>
-
-<body>
-
-	<a name="top"></a>
-	<a href="../index.html">
-		<img width="60px" src="../ChimeraX-docs-icon.svg" alt="ChimeraX docs icon" class="clRight"
-			title="User Guide Index" /></a>
-
-	<h3><a href="../index.html#tools">Tool</a>: GaudiViewX (Insilichem)</h3>
-	<p>
-		The <b>GaudiViewX</b> tool is a graphic interface for exploring, visualization, and analysis
-		for the <a href="https://github.com/insilichem/gaudi">GaudiMM suite</a> solutions.
-	</p>
-	<p>
-		The tool displays a field with all the Gaudi solutions. When the user click one or more of the
-		solutions, the
-		a type-in field. When the user hits the Return key,
-		any text in the field will be shown in the log as its HTML equivalent.
-		That means that the text:
-		<pre>
-	&lt;a href="http://www.cgl.ucsf.edu/chimerax"&gt;ChimeraX home page&lt;/a&gt;
-</pre>
-		will be logged as:
-		<br><br>
-		<a href="http://www.cgl.ucsf.edu/chimerax">ChimeraX home page</a>
-	</p>
-	<p>
-		Choosing <b>Clear</b> from the tool context menu will clear the text field
-	</p>
-
-	<hr>
-	<address>Insilichem, UAB, Barcelona, Spain /
-		May 2019</address>
-</body>
-
-</html>
+<p><a name="top"></a> <a href="../index.html"> <img class="clRight" title="User Guide Index"
+			src="../ChimeraX-docs-icon.svg" alt="ChimeraX docs icon" width="60px" /></a></p>
+<h3><a href="../index.html#tools">Tool</a>: GaudiViewX (Insilichem)</h3>
+<p>The <strong>GaudiViewX</strong> tool is a graphic interface for exploring, visualization, and analysis for the <a
+		href="https://github.com/insilichem/gaudi">GaudiMM suite</a> solutions.</p>
+<p>The tool display a table with all the solutions loaded from the input file. Clicking in one or more (with Shift ⇧)
+	solutions, the 3D drawing of each solution gets displayed in the framework.</p>
+<h4>ToolBar</h4>
+<p>In the toolbar you have 5 useful utilities:</p>
+<p>&nbsp;Open<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icon_folder.png"
+		alt="interactive connection" width="29" height="31" /></p>
+<p>Open a new window to open a new output file closing all the models of a previous output file loaded.</p>
+<p>&nbsp;Save<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icon_save.png"
+		alt="interactive connection" width="29" height="31" /></p>
+<p>Open a new window to save the current data loaded in the table in the same file or in a new one.</p>
+<p>&nbsp;Filter<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/checklist.png"
+		alt="interactive connection" width="29" height="31" /></p>
+<p>This option let the user to select among all the solutions with ones of interest. The user has to choose the
+	objective for which he wants to filter and select the logic behavior (&gt;, &lt;, =, &ge;, &le;, &ne;) and threshold
+	of the filter.</p>
+<p>&nbsp;Clustering<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/cluster-icon.png"
+		alt="interactive connection" width="29" height="31" /></p>
+<p>It allows you to do a clustering of the solutions loaded in the table. For doing the clustering, you must specify:
+</p>
+<ul>
+	<li>The objective for which you want to do the clustering.</li>
+	<li>The behavior on maximazing or minimazing this objective.</li>
+	<li>The threshold of the RMSD which which will determine if two solutions are considered equal or different.</li>
+</ul>
+<p>&nbsp;Help<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/Info_Simple.svg.png"
+		alt="interactive connection" width="31" height="31" /></p>
+<p>Display this help text.</p>
+<h4>Table Editing</h4>
+<p>You can also edit the different solutions loaded in the table:</p>
+<p>With the botton <span
+		style="background-color: #e7e7e7; color: black; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Add...</span>
+	you can add new solutions from a different file as long as it has the same objectives.</p>
+<p>Meanwhile, with the button <span
+		style="background-color: #e7e7e7; color: black; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Delete</span>
+	you can also delete the solutions selected.</p>
+<p>And with the buttons of <span
+		style="background-color: #e7e7e7; color: black; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Undo</span>
+	and <span
+		style="background-color: #e7e7e7; color: red; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Reset</span>
+	you can returned to a previous state of the table. You can undo until 5 actions and the button <span
+		style="background-color: #e7e7e7; color: red; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Reset</span>
+	will restore the table to the original one with the primary solutions from the first file loaded.</p>
+<h4>Command Line</h4>
+<p>Under the table there is a command line inpu that has the advantage with respect the ChimeraX command line of being
+	executed each time you select a new solution. In this way you can watch, for example the residue 8 in all solution
+	writing ``show :8`` in the command line only once.<br /><br /> <a href="http://www.cgl.ucsf.edu/chimerax">ChimeraX
+		home page</a></p>
+<hr />
+<address>Insilichem, UAB, Barcelona, Spain / May 2019</address>
+<div>&nbsp;</div>

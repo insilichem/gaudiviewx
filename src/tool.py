@@ -1,20 +1,8 @@
-# vim: set expandtab shiftwidth=4 softtabstop=4:
-
-# === UCSF ChimeraX Copyright ===
-# Copyright 2016 Regents of the University of California.
-# All rights reserved.  This software provided pursuant to a
-# license agreement containing restrictions on its disclosure,
-# duplication and use.  For details see:
-# http://www.rbvi.ucsf.edu/chimerax/docs/licensing.html
-# This notice must be embedded in or attached to all copies,
-# including partial copies, of the software or any revisions
-# or derivations thereof.
-# === UCSF ChimeraX Copyright ===
-
 import sys
 import yaml
 import copy
 from chimerax.core.tools import ToolInstance
+from chimerax.ui import MainToolWindow
 from PyQt5.QtCore import (
     QAbstractTableModel,
     QVariant,
@@ -43,84 +31,39 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5 import QtGui
 from PyQt5.QtGui import QKeySequence
-from . import gui, gaudireader
+from . import gui, gaudireader, toolbar
 
 
 class GaudiViewXTool(ToolInstance):
 
-    # Inheriting from ToolInstance makes us known to the ChimeraX tool mangager,
-    # so we can be notified and take appropriate action when sessions are closed,
-    # saved, or restored, and we will be listed among running tools and so on.
-    #
-    # If cleaning up is needed on finish, override the 'delete' method
-    # but be sure to call 'delete' from the superclass at the end.
-
     SESSION_ENDURING = False  # Does this instance persist when session closes
     SESSION_SAVE = True  # We do save/restore in sessions
     help = "help:user/tools/guide.html"
-    # Let ChimeraX know about our help page
 
     def __init__(self, session, tool_name):
-        # 'session'   - chimerax.core.session.Session instance
-        # 'tool_name' - string
-
-        # Initialize base class.
         super().__init__(session, tool_name)
-
-        # Set name displayed on title bar (defaults to tool_name)
-        # Must be after the superclass init, which would override it.
         self.display_name = "GaudiViewX"
 
-        # Create the main window for our tool.  The window object will have
-        # a 'ui_area' where we place the widgets composing our interface.
-        # The window isn't shown until we call its 'manage' method.
-        #
-        # Note that by default, tool windows are only hidden rather than
-        # destroyed when the user clicks the window's close button.  To change
-        # this behavior, specify 'close_destroys=True' in the MainToolWindow
-        # constructor.
-        from chimerax.ui import MainToolWindow
-
         self.tool_window = MainToolWindow(self)
-
-        # We will be adding an item to the tool's context menu, so override
-        # the default MainToolWindow fill_context_menu method
-        # self.tool_window.fill_context_menu = self.fill_context_menu
-
-        # Our user interface is simple enough that we could probably inline
-        # the code right here, but for any kind of even moderately complex
-        # interface, it is probably better to put the code in a method so
-        # that this __init__ method remains readable.
         self._build_ui()
 
     def _build_ui(self):
-        # Put our widgets in the tool window
 
-        # We will use an editable single-line text input field (QLineEdit)
-        # with a descriptive text label to the left of it (QLabel).  To
-        # arrange them horizontally side by side we use QHBoxLayout
-
-        # layout = QHBoxLayout()
-        # layout.addWidget(QLabel("Log this text:"))
-        # self.line_edit = QLineEdit()
-
-        # # Arrange for our 'return_pressed' method to be called when the
-        # # user presses the Return key
-        # self.line_edit.returnPressed.connect(self.return_pressed)
-        # layout.addWidget(self.line_edit)
-
-        # # Set the layout as the contents of our window
-        # self.tool_window.ui_area.setLayout(layout)
-
-        vbox = QVBoxLayout()
-        self.path = gui.BrowserFile().path
-
-        #####################################
+        main_layout = QVBoxLayout()
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        self.path, _ = QFileDialog.getOpenFileName(
+            QWidget(),
+            "Browser File",
+            "",
+            "Gaudi-Output Files (*.gaudi-output);;All Files (*)",
+            options=options,
+        )
 
         if self.path:
 
-            self.table = gui.MainWindow(self)
-            vbox.addWidget(gui.MyToolBar(self))
+            self.table = gui.TableSkeleton(self)
+            main_layout.addWidget(toolbar.MyToolBar(self))
             line = QFrame()
             hbox = QHBoxLayout()
 
@@ -179,7 +122,7 @@ class GaudiViewXTool(ToolInstance):
             box_layout.addStretch(1)
 
             hbox.addLayout(box_layout)
-            vbox.addLayout(hbox)
+            main_layout.addLayout(hbox)
 
             self.command_layout = QHBoxLayout()
 
@@ -187,19 +130,16 @@ class GaudiViewXTool(ToolInstance):
             self.line_edit.setPlaceholderText("Command Input")
             self.line_edit.returnPressed.connect(self.return_pressed)
             self.command_layout.addWidget(self.line_edit)
-            vbox.addSpacing(5)
+            main_layout.addSpacing(5)
 
-            vbox.addLayout(self.command_layout)
-            vbox.addSpacing(15)
+            main_layout.addLayout(self.command_layout)
+            main_layout.addSpacing(15)
 
-            vbox.addLayout(gui.LogoCopyright())
+            main_layout.addLayout(gui.LogoCopyright())
 
             #######################
 
-            self.tool_window.ui_area.setLayout(vbox)
-
-            # Show the window on the user-preferred side of the ChimeraX
-            # main window
+            self.tool_window.ui_area.setLayout(main_layout)
             self.tool_window.manage("side")
 
         else:
@@ -209,9 +149,17 @@ class GaudiViewXTool(ToolInstance):
     def add_new_data(self):
 
         self.update_saves()
-        add_file = gui.BrowserFile().path
-        if add_file:
-            add_gaudimodel = gaudireader.GaudiModel(add_file, self.session)
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        name_file, _ = QFileDialog.getOpenFileName(
+            self,
+            "Browser File",
+            "",
+            "Gaudi-Output Files (*.gaudi-output);;All Files (*)",
+            options=options,
+        )
+        if name_file:
+            add_gaudimodel = gaudireader.GaudiModel(name_file, self.session)
             if add_gaudimodel.headers == self.table.tm.headerdata:
                 self.table.tm.layoutAboutToBeChanged.emit()
                 self.table.tm.arraydata = self.table.tm.arraydata + add_gaudimodel.data
