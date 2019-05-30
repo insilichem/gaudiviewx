@@ -159,10 +159,6 @@ class TableModel(QAbstractTableModel):
             out.write(self.gaudimodel.first_line + "\n")
             out.write(yaml.safe_dump(out_data, default_flow_style=False))
 
-# # class EditBottons(QVBoxLayout):
-# #     def __init__(self, parent=None, *args)
-
-
 class LogoCopyright(QHBoxLayout):
     def __init__(self, parent=None, *args):
         QHBoxLayout.__init__(self, parent, *args)
