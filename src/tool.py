@@ -63,28 +63,17 @@ class GaudiViewXTool(ToolInstance):
         if self.path:
 
             self.table = gui.TableSkeleton(self)
+            self.arraydata = copy.copy(self.table.tm.arraydata)
+            self.headerdata = copy.copy(self.table.tm.headerdata)
             main_layout.addWidget(toolbar.MyToolBar(self))
-            line = QFrame()
             hbox = QHBoxLayout()
 
             hbox.addWidget(self.table)
 
             # Undo
-            self.data_save0 = copy.copy(
-                [self.table.tm.arraydata, self.table.tm.headerdata]
-            )
-            self.data_save1 = copy.copy(
-                [self.table.tm.arraydata, self.table.tm.headerdata]
-            )
-            self.data_save2 = copy.copy(
-                [self.table.tm.arraydata, self.table.tm.headerdata]
-            )
-            self.data_save3 = copy.copy(
-                [self.table.tm.arraydata, self.table.tm.headerdata]
-            )
-            self.data_save4 = copy.copy(
-                [self.table.tm.arraydata, self.table.tm.headerdata]
-            )
+            self.data_save0, self.data_save1, self.data_save2, self.data_save3, self.data_save4 = [
+                copy.deepcopy([self.arraydata, self.headerdata]) for i in range(5)
+            ]
 
             # Box bottons
             box_layout = QVBoxLayout()
@@ -152,7 +141,7 @@ class GaudiViewXTool(ToolInstance):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         name_file, _ = QFileDialog.getOpenFileName(
-            self,
+            QWidget(),
             "Browser File",
             "",
             "Gaudi-Output Files (*.gaudi-output);;All Files (*)",
@@ -162,9 +151,9 @@ class GaudiViewXTool(ToolInstance):
             add_gaudimodel = gaudireader.GaudiModel(name_file, self.session)
             if add_gaudimodel.headers == self.table.tm.headerdata:
                 self.table.tm.layoutAboutToBeChanged.emit()
-                self.table.tm.arraydata = self.table.tm.arraydata + add_gaudimodel.data
+                self.arraydata = self.arraydata + add_gaudimodel.data
                 self.table.tm.layoutChanged.emit()
-                nrows = len(self.table.tm.arraydata)
+                nrows = len(self.arraydata)
                 for row in range(nrows):
                     self.table.setRowHeight(row, 25)
                 self.table.models.update(add_gaudimodel.save_models())
@@ -181,8 +170,7 @@ class GaudiViewXTool(ToolInstance):
 
         self.update_saves()
         self.table.tm.layoutAboutToBeChanged.emit()
-        self.table.tm.arraydata = self.table.tm.backdoor[0]
-        self.table.tm.headerdata = self.table.tm.backdoor[1]
+        self.table.tm.arraydata, self.table.tm.headerdata = self.table.tm.backdoor
         self.table.tm.layoutChanged.emit()
         nrows = len(self.table.tm.arraydata)
         for row in range(nrows):
@@ -202,19 +190,18 @@ class GaudiViewXTool(ToolInstance):
 
         self.table.tm.layoutAboutToBeChanged.emit()
 
-        if [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save4:
+        if [self.arraydata, self.headerdata] == self.data_save4:
             return
-        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save3:
+        elif [self.arraydata, self.headerdata] == self.data_save3:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save4
-        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save2:
+        elif [self.arraydata, self.headerdata] == self.data_save2:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save3
-        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save1:
+        elif [self.arraydata, self.headerdata] == self.data_save1:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save2
-        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save0:
+        elif [self.arraydata, self.headerdata] == self.data_save0:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save1
         else:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save0
-
         self.table.tm.layoutChanged.emit()
 
         nrows = len(self.table.tm.arraydata)
@@ -223,42 +210,22 @@ class GaudiViewXTool(ToolInstance):
 
     def update_saves(self):
 
-        self.data_save4 = copy.copy(self.data_save3)
-        self.data_save3 = copy.copy(self.data_save2)
-        self.data_save2 = copy.copy(self.data_save1)
-        self.data_save1 = copy.copy(self.data_save0)
-        self.data_save0 = copy.copy([self.table.tm.arraydata, self.table.tm.headerdata])
+        self.data_save4 = copy.deepcopy(self.data_save3)
+        self.data_save3 = copy.deepcopy(self.data_save2)
+        self.data_save2 = copy.deepcopy(self.data_save1)
+        self.data_save1 = copy.deepcopy(self.data_save0)
+        self.data_save0 = copy.deepcopy([self.arraydata, self.headerdata])
 
     def return_pressed(self):
-        # The use has pressed the Return key; log the current text as HTML
         from chimerax.core.commands import run
 
-        # ToolInstance has a 'session' attribute...
         run(self.session, "%s" % self.line_edit.text())
-
-    def fill_context_menu(self, menu, x, y):
-        # Add any tool-specific items to the given context menu (a QMenu instance).
-        # The menu will then be automatically filled out with generic tool-related actions
-        # (e.g. Hide Tool, Help, Dockable Tool, etc.)
-        #
-        # The x,y args are the x() and y() values of QContextMenuEvent, in the rare case
-        # where the items put in the menu depends on where in the tool interface the menu
-        # was raised.
-        from PyQt5.QtWidgets import QAction
-
-        clear_action = QAction("Clear", menu)
-        clear_action.triggered.connect(lambda *args: self.line_edit.clear())
-        menu.addAction(clear_action)
 
     def take_snapshot(self, session, flags):
         return {"version": 1, "current text": self.line_edit.text()}
 
     @classmethod
     def restore_snapshot(class_obj, session, data):
-        # Instead of using a fixed string when calling the constructor below, we could
-        # have saved the tool name during take_snapshot() (from self.tool_name, inherited
-        # from ToolInstance) and used that saved tool name.  There are pros and cons to
-        # both approaches.
         inst = class_obj(session, "GaudiViewX")
         inst.line_edit.setText(data["current text"])
         return inst

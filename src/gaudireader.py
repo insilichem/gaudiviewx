@@ -2,9 +2,7 @@ import tempfile
 import zipfile
 import yaml
 import os
-import multiprocessing
 from chimerax.core import models, io
-from chimerax.core.commands import run, concise_model_spec
 
 
 class GaudiModel(object):

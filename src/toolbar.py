@@ -1,4 +1,5 @@
 import operator
+import copy
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
     QVBoxLayout,
@@ -20,6 +21,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from chimerax.core.geometry import align_points
 from chimerax.core.commands import run
 from . import gaudireader
+
 
 class MyToolBar(QToolBar):
     def __init__(self, window, parent=None, *args):
@@ -63,7 +65,6 @@ class MyToolBar(QToolBar):
 
     def toolbtnpressed(self, action):
         if action.text() == "Open":
-            self.window.update_saves()
             self.add_file()
         elif action.text() == "Save":
             options = QFileDialog.Options()
@@ -80,10 +81,8 @@ class MyToolBar(QToolBar):
             if filename:
                 self.table.tm.write_output(filename)
         elif action.text() == "Filter":
-            self.window.update_saves()
             FilterBox(self)
         elif action.text() == "Clustering":
-            self.window.update_saves()
             ClusteringBox(self)
         elif action.text() == "Help":
             self.window.display_help()
@@ -100,11 +99,11 @@ class MyToolBar(QToolBar):
         )
 
         if name_file:
+            self.window.update_saves()
             self.table.tm.layoutAboutToBeChanged.emit()
             self.table.tm.removeRows(0, len(self.table.tm.arraydata))
             new_gaudimodel = gaudireader.GaudiModel(name_file, self.table.session)
             self.table.tm.arraydata = new_gaudimodel.data
-            self.table.tm.backdoor = self.table.tm.arraydata
             self.table.tm.headerdata = new_gaudimodel.headers
             self.table.models = new_gaudimodel.save_models()
             self.window.delete_butn.setEnabled(False)
@@ -113,6 +112,10 @@ class MyToolBar(QToolBar):
             for row in range(nrows):
                 self.table.setRowHeight(row, 25)
             run(self.session, "close")
+
+            self.backdoor = copy.deepcopy(
+                [self.table.tm.arraydata, self.table.tm.headerdata]
+            )
 
     def save_file(self):
         self.table.tm.gaudimodel.path
@@ -134,7 +137,7 @@ class FilterBox(QDialog):
 
         self.vbox = QVBoxLayout()
         gbox = QGroupBox()
-        gbox.setTitle("Remain the solutions with...")
+        gbox.setTitle("Keep solutions with...")
         self.bbox = QButtonGroup()
         vbox_radio = QVBoxLayout()
 
@@ -174,6 +177,7 @@ class FilterBox(QDialog):
         return self.vbox
 
     def run_filter(self):
+        self.toolbar.window.update_saves()
         self.objective = self.bbox.checkedButton().text()
         logic = self.logicbox.currentText()
         self.filter_number = float(self.number_box.value())
@@ -297,6 +301,7 @@ class ClusteringBox(QDialog):
 
     def run_clustering(self):
 
+        self.toolbar.window.update_saves()
         order = self.toogle_bar.activated
         objective = self.bbox.checkedButton().text()
         sorted(
@@ -353,6 +358,7 @@ def calculate_rmsd(ref_models, to_models, cutoff):
             1
         ]
     return rmsd
+
 
 class ToogleBar(QHBoxLayout):
     def __init__(self, activated=None, parent=None):

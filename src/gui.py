@@ -110,7 +110,7 @@ class TableModel(QAbstractTableModel):
         self.output = (self.gaudimodel.first_line, self.gaudimodel.raw_data)
         self.models = self.gaudimodel.save_models()
 
-        self.backdoor = [copy.copy(self.arraydata), copy.copy(self.headerdata)]
+        self.backdoor = copy.deepcopy([self.arraydata, self.headerdata])
 
     def rowCount(self, parent):
         return len(self.arraydata)
@@ -158,6 +158,7 @@ class TableModel(QAbstractTableModel):
         with open(path, "w") as out:
             out.write(self.gaudimodel.first_line + "\n")
             out.write(yaml.safe_dump(out_data, default_flow_style=False))
+
 
 class LogoCopyright(QHBoxLayout):
     def __init__(self, parent=None, *args):
