@@ -3,6 +3,7 @@ import yaml
 import copy
 from chimerax.core.tools import ToolInstance
 from chimerax.ui import MainToolWindow
+from chimerax.core.commands import run
 from PyQt5.QtCore import (
     QAbstractTableModel,
     QVariant,
@@ -63,8 +64,6 @@ class GaudiViewXTool(ToolInstance):
         if self.path:
 
             self.table = gui.TableSkeleton(self)
-            self.arraydata = copy.copy(self.table.tm.arraydata)
-            self.headerdata = copy.copy(self.table.tm.headerdata)
             main_layout.addWidget(toolbar.MyToolBar(self))
             hbox = QHBoxLayout()
 
@@ -72,7 +71,8 @@ class GaudiViewXTool(ToolInstance):
 
             # Undo
             self.data_save0, self.data_save1, self.data_save2, self.data_save3, self.data_save4 = [
-                copy.deepcopy([self.arraydata, self.headerdata]) for i in range(5)
+                copy.deepcopy([self.table.tm.arraydata, self.table.tm.headerdata])
+                for i in range(5)
             ]
 
             # Box bottons
@@ -151,9 +151,9 @@ class GaudiViewXTool(ToolInstance):
             add_gaudimodel = gaudireader.GaudiModel(name_file, self.session)
             if add_gaudimodel.headers == self.table.tm.headerdata:
                 self.table.tm.layoutAboutToBeChanged.emit()
-                self.arraydata = self.arraydata + add_gaudimodel.data
+                self.table.tm.arraydata = self.table.tm.arraydata + add_gaudimodel.data
                 self.table.tm.layoutChanged.emit()
-                nrows = len(self.arraydata)
+                nrows = len(self.table.tm.arraydata)
                 for row in range(nrows):
                     self.table.setRowHeight(row, 25)
                 self.table.models.update(add_gaudimodel.save_models())
@@ -185,20 +185,21 @@ class GaudiViewXTool(ToolInstance):
         self.update_saves()
         indexes = self.table.selectionModel().selectedRows()
         self.table.tm.removeRows(indexes[0].row(), len(indexes))
+        self.delete_butn.setEnabled(False)
 
     def undo(self):
 
         self.table.tm.layoutAboutToBeChanged.emit()
 
-        if [self.arraydata, self.headerdata] == self.data_save4:
+        if [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save4:
             return
-        elif [self.arraydata, self.headerdata] == self.data_save3:
+        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save3:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save4
-        elif [self.arraydata, self.headerdata] == self.data_save2:
+        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save2:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save3
-        elif [self.arraydata, self.headerdata] == self.data_save1:
+        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save1:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save2
-        elif [self.arraydata, self.headerdata] == self.data_save0:
+        elif [self.table.tm.arraydata, self.table.tm.headerdata] == self.data_save0:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save1
         else:
             self.table.tm.arraydata, self.table.tm.headerdata = self.data_save0
@@ -214,11 +215,11 @@ class GaudiViewXTool(ToolInstance):
         self.data_save3 = copy.deepcopy(self.data_save2)
         self.data_save2 = copy.deepcopy(self.data_save1)
         self.data_save1 = copy.deepcopy(self.data_save0)
-        self.data_save0 = copy.deepcopy([self.arraydata, self.headerdata])
+        self.data_save0 = copy.deepcopy(
+            [self.table.tm.arraydata, self.table.tm.headerdata]
+        )
 
     def return_pressed(self):
-        from chimerax.core.commands import run
-
         run(self.session, "%s" % self.line_edit.text())
 
     def take_snapshot(self, session, flags):
@@ -229,4 +230,3 @@ class GaudiViewXTool(ToolInstance):
         inst = class_obj(session, "GaudiViewX")
         inst.line_edit.setText(data["current text"])
         return inst
-
