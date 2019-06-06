@@ -26,7 +26,6 @@ class TableSkeleton(QTableView):
 
         # Set the table model
         self.tm = TableModel(window.path, self)
-        self.models = self.tm.models
         self.setModel(self.tm)
 
         # Set the minimum size
@@ -64,31 +63,26 @@ class TableSkeleton(QTableView):
 
     def handleSelectionChanged(self, selected, deselected):
 
-        selection = retrieve_models(selected, self.hh, self.models)
-        deselection = retrieve_models(deselected, self.hh, self.models)
+        print(selected)
+        selection = retrieve_models(selected, self.hh)
+        deselection = retrieve_models(deselected, self.hh)
 
         if deselection:
             for model in deselection:
-                hide(self.session, model)
+                self.tm.gaudimain.not_display(model)
 
         for model in selection:
-            if not all(
-                i in [actmodel._name for actmodel in self.session.models.list()]
-                for i in [m._name for m in model]
-            ):
-                self.session.models.add(model)
-            else:
-                show(self.session, model)
+            self.tm.gaudimain.display(model)
         self.window.return_pressed()
 
 
-def retrieve_models(selected, header, models):
+def retrieve_models(selected, header):
 
     names = [
         selected.indexes()[i]
         for i in range(0, len(selected.indexes()) - (len(header) - 1), len(header))
     ]
-    selection = [models[index.data()] for index in names]
+    selection = [index.data() for index in names]
 
     return selection
 
@@ -104,11 +98,10 @@ def hide(session, models):
 class TableModel(QAbstractTableModel):
     def __init__(self, data, parent=None, *args):
         QAbstractTableModel.__init__(self, parent, *args)
-        self.gaudimodel = gaudireader.GaudiModel(data, parent.session)
-        self.arraydata = self.gaudimodel.data
-        self.headerdata = self.gaudimodel.headers
-        self.output = (self.gaudimodel.first_line, self.gaudimodel.raw_data)
-        self.models = self.gaudimodel.save_models()
+        self.gaudimain = gaudireader.GaudiController(parent.session)
+        self.gaudimain.add_gaudimodel(data)
+        self.arraydata = self.gaudimain.gaudimodel[0].data
+        self.headerdata = self.gaudimain.gaudimodel[0].headers
 
         self.backdoor = copy.deepcopy([self.arraydata, self.headerdata])
 
@@ -150,13 +143,15 @@ class TableModel(QAbstractTableModel):
 
     def write_output(self, path):
         out_data = {}
-        out_data["GAUDI.objectives"] = self.gaudimodel.raw_data["GAUDI.objectives"]
+        out_data["GAUDI.objectives"] = self.gaudimain.gaudimodel[0].raw_data[
+            "GAUDI.objectives"
+        ]
         if "Cluster" in self.headerdata:
             out_data["GAUDI.results"] = {row[0]: row[1:-1] for row in self.arraydata}
         else:
             out_data["GAUDI.results"] = {row[0]: row[1:] for row in self.arraydata}
         with open(path, "w") as out:
-            out.write(self.gaudimodel.first_line + "\n")
+            out.write(self.gaudimain.gaudimodel[0].first_line + "\n")
             out.write(yaml.safe_dump(out_data, default_flow_style=False))
 
 

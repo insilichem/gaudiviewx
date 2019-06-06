@@ -148,15 +148,17 @@ class GaudiViewXTool(ToolInstance):
             options=options,
         )
         if name_file:
-            add_gaudimodel = gaudireader.GaudiModel(name_file, self.session)
-            if add_gaudimodel.headers == self.table.tm.headerdata:
+            if gaudireader.equal_objectives(name_file) == self.table.tm.headerdata:
+                self.table.tm.gaudimain.add_gaudimodel(name_file)
                 self.table.tm.layoutAboutToBeChanged.emit()
-                self.table.tm.arraydata = self.table.tm.arraydata + add_gaudimodel.data
+                self.table.tm.arraydata = (
+                    self.table.tm.arraydata
+                    + self.table.tm.gaudimain.gaudimodel[-1].data
+                )
                 self.table.tm.layoutChanged.emit()
                 nrows = len(self.table.tm.arraydata)
                 for row in range(nrows):
                     self.table.setRowHeight(row, 25)
-                self.table.models.update(add_gaudimodel.save_models())
             else:
                 mesbox = QMessageBox()
                 mesbox.setIcon(QMessageBox.Warning)

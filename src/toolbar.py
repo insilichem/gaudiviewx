@@ -16,11 +16,12 @@ from PyQt5.QtWidgets import (
     QRadioButton,
     QDoubleSpinBox,
     QButtonGroup,
+    QProgressDialog,
 )
 from PyQt5.QtGui import QIcon, QPixmap
 from chimerax.core.geometry import align_points
 from chimerax.core.commands import run
-from . import gaudireader
+from . import gaudireader, gui
 
 
 class MyToolBar(QToolBar):
@@ -102,10 +103,10 @@ class MyToolBar(QToolBar):
             self.window.update_saves()
             self.table.tm.layoutAboutToBeChanged.emit()
             self.table.tm.removeRows(0, len(self.table.tm.arraydata))
-            new_gaudimodel = gaudireader.GaudiModel(name_file, self.table.session)
-            self.table.tm.arraydata = new_gaudimodel.data
-            self.table.tm.headerdata = new_gaudimodel.headers
-            self.table.models = new_gaudimodel.save_models()
+            self.gaudimain = gaudireader.GaudiController(self.session)
+            self.gaudimain.add_gaudimodel(name_file)
+            self.arraydata = self.gaudimain.gaudimodel[0].data
+            self.headerdata = self.gaudimain.gaudimodel[0].headers
             self.window.delete_butn.setEnabled(False)
             self.table.tm.layoutChanged.emit()
             nrows = len(self.table.tm.arraydata)
@@ -116,10 +117,6 @@ class MyToolBar(QToolBar):
             self.backdoor = copy.deepcopy(
                 [self.table.tm.arraydata, self.table.tm.headerdata]
             )
-
-    def save_file(self):
-        self.table.tm.gaudimodel.path
-
 
 class FilterBox(QDialog):
     def __init__(self, toolbar, parent=None, *args):
@@ -313,8 +310,28 @@ class ClusteringBox(QDialog):
 
         rmsd_value = self.rmsd_box.value()
         solutions = []
+
+        count = 0
+        progress = QProgressDialog(
+            "Loading the solutions...",
+            None,
+            count,
+            len(self.toolbar.table.tm.arraydata) * 2,
+        )
+        progress.setFixedWidth(300)
+        progress.setWindowTitle("Clustering Progress")
+        progress.setWindowModality(Qt.WindowModal)
+
+        progress.forceShow()
+
         for row in self.toolbar.table.tm.arraydata:
-            solutions.append((row[0], self.toolbar.table.models[row[0]]))
+            count += 1
+            progress.setValue(count)
+            if not row[0] in self.toolbar.table.tm.gaudimain.models:
+                for gm in self.toolbar.table.tm.gaudimain.gaudimodel:
+                    if row[0] in gm.keys:
+                        gm.parse_zip(row[0])
+            solutions.append((row[0], self.toolbar.table.tm.gaudimain.models[row[0]]))
         clusters = [[]]
 
         self.toolbar.table.tm.layoutAboutToBeChanged.emit()
@@ -325,8 +342,11 @@ class ClusteringBox(QDialog):
 
         clusters[0].append(solutions.pop(0))
 
+        progress.setLabelText("Calculating RMSD...")
         while solutions:
             next_sol = solutions.pop(0)
+            count += 1
+            progress.setValue(count)
             for cluster in clusters:
                 rmsd = calculate_rmsd(cluster[0][1], next_sol[1], rmsd_value)
                 if rmsd < rmsd_value:
@@ -335,6 +355,8 @@ class ClusteringBox(QDialog):
             else:
                 clusters.append([next_sol])
 
+        progress.setLabelText("DONE")
+
         for index, cluster in enumerate(clusters):
             for key, models in cluster:
                 for row in self.toolbar.table.tm.arraydata:
@@ -342,7 +364,13 @@ class ClusteringBox(QDialog):
                         row.insert(index_cluster, index + 1)
 
         self.toolbar.table.tm.layoutChanged.emit()
+        if self.toolbar.table.selectionModel().hasSelection():
+            for index in self.toolbar.table.selectionModel().selection().indexes():
+                if index.data() in self.toolbar.table.tm.gaudimain.models:
+                    model = self.toolbar.table.tm.gaudimain.models[index.data()]
+                    gaudireader.hide(self.toolbar.session, model)
 
+        progress.close()
         self.hide()
 
 

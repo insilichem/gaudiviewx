@@ -5,7 +5,7 @@ When uploaded to the ChimeraX toolshed, the bundle
 will be displayed without the ChimeraX- prefix.
 -->
 
-<BundleInfo name="GaudiViewX"
+<BundleInfo name="ChimeraX-GaudiViewX"
 	    version="0.5" package="chimerax.gaudiviewx"
   	    minSessionVersion="1" maxSessionVersion="1">
 
@@ -31,8 +31,8 @@ GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
   <!-- Dependencies on other ChimeraX/Python packages -->
   <!-- This example uses functionality from the Tutorial_Command bundle -->
   <Dependencies>
-    <Dependency name="ChimeraX-Core" version=">=0.1"/>
     <Dependency name="Pyyaml" version=">=5.0"/>
+    <Dependency name="ChimeraX-Core" version=">=0.1"/>
     <Dependency name="ChimeraX-UI" version=">=1.0"/>
   </Dependencies>
 
