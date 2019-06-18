@@ -45,7 +45,7 @@ GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
   <Classifiers>
     <!-- Development Status should be compatible with bundle version number -->
     <PythonClassifier>Development Status :: 3 - Alpha</PythonClassifier>
-    <PythonClassifier>License :: Freeware</PythonClassifier>
+    <PythonClassifier>License :: Apache-2.0</PythonClassifier>
     <!-- ChimeraX classifiers describe supplied functionality -->
     <!-- Register a graphical interface tool -->
     <ChimeraXClassifier>ChimeraX :: Tool :: GaudiViewX ::

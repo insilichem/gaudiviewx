@@ -27,7 +27,7 @@ In the toolbar there are 5 utilities:
     :align: center
 
 |icon1| | Open
-************
+**************
 
 .. |icon1| image:: ../src/icons/open.png
     :width: 4%
