@@ -20,32 +20,35 @@ or derivations thereof.
 	solutions, the 3D drawing of each solution gets displayed in the framework.</p>
 <h4>ToolBar</h4>
 <p>In the toolbar you have 5 useful utilities:</p>
-<p>&nbsp;Open<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icon_folder.png"
+<p>&nbsp;Open<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/open.png"
 		alt="interactive connection" width="29" height="31" /></p>
 <p>Open a new window to open a new output file closing all the models of a previous output file loaded.</p>
-<p>&nbsp;Save<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icon_save.png"
+<p>&nbsp;Save<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/save.png"
 		alt="interactive connection" width="29" height="31" /></p>
 <p>Open a new window to save the current data loaded in the table in the same file or in a new one.</p>
-<p>&nbsp;Filter<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/checklist.png"
+<p>&nbsp;Filter<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/filter.png"
 		alt="interactive connection" width="29" height="31" /></p>
 <p>This option let the user to select among all the solutions with ones of interest. The user has to choose the
 	objective for which he wants to filter and select the logic behavior (&gt;, &lt;, =, &ge;, &le;, &ne;) and threshold
 	of the filter.</p>
-<p>&nbsp;Clustering<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/cluster-icon.png"
+<p>With the button in the left-bottom corner, the user can add more conditionals with their objective, logical behavior
+	and threshold. The conditional are attached by the logical operators AND/OR. AND joins the conditionals in a unique
+	conditional, meanwhile the OR will let the user specify another independent conditional. </p>
+<p>&nbsp;Clustering<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/clustering.png"
 		alt="interactive connection" width="29" height="31" /></p>
 <p>It allows you to do a clustering of the solutions loaded in the table. For doing the clustering, you must specify:
 </p>
 <ul>
 	<li>The objective for which you want to do the clustering.</li>
-	<li>The behavior on maximazing or minimazing this objective.</li>
+	<li>The behavior on maximizing or minimizing this objective.</li>
 	<li>The threshold of the RMSD which which will determine if two solutions are considered equal or different.</li>
 </ul>
-<p>&nbsp;Help<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/Info_Simple.svg.png"
+<p>&nbsp;Help<img style="float: left;" src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/help.png"
 		alt="interactive connection" width="31" height="31" /></p>
 <p>Display this help text.</p>
 <h4>Table Editing</h4>
 <p>You can also edit the different solutions loaded in the table:</p>
-<p>With the botton <span
+<p>With the button <span
 		style="background-color: #e7e7e7; color: black; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Add...</span>
 	you can add new solutions from a different file as long as it has the same objectives.</p>
 <p>Meanwhile, with the button <span
@@ -59,10 +62,13 @@ or derivations thereof.
 		style="background-color: #e7e7e7; color: red; border: 2px; border-color: black; display: inline-block; padding: 3px 10px; ; border-radius: 5px;">Reset</span>
 	will restore the table to the original one with the primary solutions from the first file loaded.</p>
 <h4>Command Line</h4>
-<p>Under the table there is a command line inpu that has the advantage with respect the ChimeraX command line of being
+<p>Under the table there is a command line input that has the advantage with respect the ChimeraX command line of being
 	executed each time you select a new solution. In this way you can watch, for example the residue 8 in all solution
 	writing ``show :8`` in the command line only once.<br /><br /> <a href="http://www.cgl.ucsf.edu/chimerax">ChimeraX
 		home page</a></p>
 <hr />
 <address>Insilichem, UAB, Barcelona, Spain / May 2019</address>
+<br>
+<img src="/home/andres/practicas/chimerax/gaudiviewx/src/icons/insilichem.png" alt="Insilichem logo" width="100"
+	height="100">
 <div>&nbsp;</div>

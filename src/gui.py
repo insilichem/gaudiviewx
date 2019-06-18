@@ -59,40 +59,22 @@ class TableSkeleton(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.selection = self.selectionModel()
-        self.selection.selectionChanged.connect(self.handleSelectionChanged)
+        self.selection.selectionChanged.connect(self.handle_selection)
+        self.deselection = None
 
-    def handleSelectionChanged(self, selected, deselected):
+    def handle_selection(self):
 
-        print(selected)
-        selection = retrieve_models(selected, self.hh)
-        deselection = retrieve_models(deselected, self.hh)
-
-        if deselection:
-            for model in deselection:
+        if self.deselection:
+            for model in self.deselection:
                 self.tm.gaudimain.not_display(model)
+
+        selection = [index.data() for index in self.selection.selectedRows()]
+
+        self.deselection = selection
 
         for model in selection:
             self.tm.gaudimain.display(model)
         self.window.return_pressed()
-
-
-def retrieve_models(selected, header):
-
-    names = [
-        selected.indexes()[i]
-        for i in range(0, len(selected.indexes()) - (len(header) - 1), len(header))
-    ]
-    selection = [index.data() for index in names]
-
-    return selection
-
-
-def show(session, models):
-    run(session, "show %s target m" % concise_model_spec(session, models))
-
-
-def hide(session, models):
-    run(session, "hide %s target m" % concise_model_spec(session, models))
 
 
 class TableModel(QAbstractTableModel):
@@ -169,7 +151,7 @@ class LogoCopyright(QHBoxLayout):
         logo.setCursor(Qt.PointingHandCursor)
         logo.setPixmap(
             QPixmap(
-                "/home/andres/practicas/chimerax/tut_tool_qt/src/insilichem.png"
+                "/home/andres/practicas/chimerax/gaudiviewx/src/icons/insilichem.png"
             ).scaled(100, 87.5, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
         logo.setAlignment(Qt.AlignCenter)

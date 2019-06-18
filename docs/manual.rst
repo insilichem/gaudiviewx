@@ -52,7 +52,13 @@ same file or in a new one.
 
 This option let the user to select among all the solutions with ones of
 interest. The user has to choose the objective for which he wants to filter
-and select the logic behavior (>, <, =, ≥, ≤, ≠) and threshold of the filter:
+and select the logic behavior (>, <, =, ≥, ≤, ≠) and threshold of the filter.
+
+With the button in the left-bottom corner, the user can add more conditionals
+with their objective, logical behavior and threshold. The conditional are
+attached by the logical operators AND/OR. AND joins the conditionals in a
+unique conditional, meanwhile the OR will let the user specify another
+independent conditional:
 
 .. image:: _images/filter.png
     :align: center
@@ -68,7 +74,7 @@ It allows you to do a clustering of the solutions loaded in the table. For
 doing the clustering, you must specify:
    
 - The **objective** for which you want to do the clustering.
-- The behavior on **maximazing** or **minimazing** this objective.
+- The behavior on **maximizing** or **minimizing** this objective.
 - The **threshold of the RMSD** which which will determine if two solutions are considered equal or different.
 
 .. image:: _images/clustering.png
