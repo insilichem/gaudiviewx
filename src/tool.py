@@ -37,7 +37,7 @@ from . import gui, gaudireader, toolbar
 
 class GaudiViewXTool(ToolInstance):
 
-    SESSION_ENDURING = False  # Does this instance persist when session closes
+    SESSION_ENDURING = True  # Does this instance persist when session closes
     SESSION_SAVE = True  # We do save/restore in sessions
     help = "help:user/tools/guide.html"
 

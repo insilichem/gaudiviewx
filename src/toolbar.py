@@ -103,19 +103,20 @@ class MyToolBar(QToolBar):
         )
 
         if name_file:
+            from . import gui
             self.window.update_saves()
             self.table.tm.layoutAboutToBeChanged.emit()
             self.table.tm.removeRows(0, len(self.table.tm.arraydata))
-            self.gaudimain = gaudireader.GaudiController(self.session)
-            self.gaudimain.add_gaudimodel(name_file)
-            self.table.tm.arraydata = self.gaudimain.gaudimodel[0].data
-            self.table.tm.headerdata = self.gaudimain.gaudimodel[0].headers
+            self.table.tm.gaudimain = gaudireader.GaudiController(self.session)
+            self.table.tm.gaudimain.add_gaudimodel(name_file)
+            self.table.tm.arraydata = self.table.tm.gaudimain.gaudimodel[0].data
+            self.table.tm.headerdata = self.table.tm.gaudimain.gaudimodel[0].headers
             self.window.delete_butn.setEnabled(False)
             self.table.tm.layoutChanged.emit()
             nrows = len(self.table.tm.arraydata)
             for row in range(nrows):
                 self.table.setRowHeight(row, 25)
-            run(self.session, "close")
+            run(self.session, "close session")
 
             self.backdoor = copy.deepcopy(
                 [self.table.tm.arraydata, self.table.tm.headerdata]
