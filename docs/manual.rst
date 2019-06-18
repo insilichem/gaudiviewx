@@ -29,7 +29,7 @@ In the toolbar there are 5 utilities:
 |icon1| | Open
 ************
 
-.. |icon1| image:: ../src/icon_folder.png
+.. |icon1| image:: ../src/icons/open.png
     :width: 4%
 
 Open a new window to open a new output file closing all the models of a
@@ -38,7 +38,7 @@ previous output file loaded.
 |icon2| | Save
 **************
 
-.. |icon2| image:: ../src/icon_save.png
+.. |icon2| image:: ../src/icons/save.png
     :width: 4%
 
 Open a new window to save the current data loaded in the table in the
@@ -47,7 +47,7 @@ same file or in a new one.
 |icon3| | Filter
 ****************
 
-.. |icon3| image:: ../src/checklist.png
+.. |icon3| image:: ../src/icons/filter.png
     :width: 4%
 
 This option let the user to select among all the solutions with ones of
@@ -66,7 +66,7 @@ independent conditional:
 |icon4| | Clustering
 ********************
 
-.. |icon4| image:: ../src/cluster-icon.png
+.. |icon4| image:: ../src/icons/clustering.png
     :width: 4%
 
 
@@ -88,7 +88,7 @@ solution for that cluster.
 |icon5| | Help
 **************
 
-.. |icon5| image:: ../src/Info_Simple.svg.png
+.. |icon5| image:: ../src/icons/help.png
     :width: 4%
 
 
