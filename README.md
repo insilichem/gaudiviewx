@@ -4,6 +4,7 @@
    https://github.com/insilichem/gaudiviewx
 
    Copyright 2019 Andrés Giner Antón, Jaime Rodriguez-Guerra
+   and Jean-Didier Marechal
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,7 +20,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/gaudiviewx/badge/?version=latest)](https://gaudiviewx.readthedocs.io/en/latest/?badge=latest)
 [![Python 3.6.8](https://img.shields.io/badge/python-3.6.8-blue.svg)](https://www.python.org/downloads/release/python-368/)
-[![](https://img.shields.io/github/license/andresginera/pgaudi.svg?color=orange)](https://opensource.org/licenses/Apache-2.0)
+[![](https://img.shields.io/github/license/andresginera/pgaudi.svg?color=orange)](http://www.apache.org/licenses/LICENSE-2.0)
 ![](https://img.shields.io/static/v1.svg?label=platform&message=linux%20|%20osx&color=lightgrey)
 
 GaudiViewX
