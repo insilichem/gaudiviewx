@@ -1,7 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Imports
+# Python
 import tempfile
 import zipfile
 import yaml
 import os
+
+# ChimeraX
 from chimerax.core import models, io
 from chimerax.core.commands import run, concise_model_spec
 
@@ -14,7 +21,6 @@ class GaudiModel(object):
         self.data, self.headers, self.keys = self.parse()
         self.tempdir = tempfile.mkdtemp("gaudiviewx")
         self.session = session
-        self.models = {}
 
     def parse(self):
         with open(self.path, "r") as f:
@@ -89,15 +95,6 @@ class GaudiController(object):
 
     def not_display(self, key):
         hide(self.session, self.models[key])
-
-
-def equal_objectives(path):
-    with open(path, "r") as f:
-        data = yaml.safe_load(f)
-    header = ["Filename"] + list(
-        map(lambda text: text.split()[0], data["GAUDI.objectives"])
-    )
-    return header
 
 
 def show(session, models):

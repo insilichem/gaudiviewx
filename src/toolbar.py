@@ -1,6 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Imports
+# Python
 import operator
 import copy
-from PyQt5.QtCore import Qt, pyqtSignal, QRect
+
+# ChimeraX
+from chimerax.core.geometry import align_points
+from chimerax.core.commands import run
+
+# PyQt5
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
@@ -20,10 +32,8 @@ from PyQt5.QtWidgets import (
     QScrollArea,
     QFrame,
 )
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtGui import QIcon, QPixmap, QRegion
-from chimerax.core.geometry import align_points
-from chimerax.core.commands import run
+
+# Relative
 from . import gaudireader, gui
 
 
@@ -179,7 +189,6 @@ class FilterBox(QDialog):
         new = FilterCondition(self.toolbar, widgets=self.widgets)
         self.scroll_layout.addWidget(new)
         self.widgets.append(new)
-        # self.scroll_layout.addStretch(2)
 
     def run_filter(self):
         self.toolbar.window.update_saves()
@@ -221,26 +230,25 @@ class FilterBox(QDialog):
             for w in condition:
                 index = self.toolbar.table.tm.headerdata.index(w[0])
                 if w[1] == ">":
-                    a = greater(index, conditional_array, w[2])
+                    conditional_array = greater(index, conditional_array, w[2])
                 elif w[1] == "<":
-                    a = lesser(index, conditional_array, w[2])
+                    conditional_array = lesser(index, conditional_array, w[2])
                 elif w[1] == "=":
-                    a = equal(index, conditional_array, w[2])
+                    conditional_array = equal(index, conditional_array, w[2])
                 elif w[1] == "≥":
-                    a = greater_equal(index, conditional_array, w[2])
+                    conditional_array = greater_equal(index, conditional_array, w[2])
                 elif w[1] == "≤":
-                    a = lesser_equal(index, conditional_array, w[2])
+                    conditional_array = lesser_equal(index, conditional_array, w[2])
                 elif w[1] == "≠":
-                    a = not_equal(index, conditional_array, w[2])
-                conditional_array = a
+                    conditional_array = not_equal(index, conditional_array, w[2])
             filtered_array.extend(conditional_array)
 
-        unique_fa = []
+        unique = []
         for row in filtered_array:
-            if not row in unique_fa:
-                unique_fa.append(row)
+            if not row in unique:
+                unique.append(row)
 
-        self.toolbar.table.tm.arraydata = unique_fa
+        self.toolbar.table.tm.arraydata = unique
         self.toolbar.table.tm.layoutChanged.emit()
         self.hide()
 

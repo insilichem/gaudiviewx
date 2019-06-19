@@ -1,19 +1,25 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Imports
+# Python
 import operator
 import yaml
 import webbrowser
 import copy
+
+# PyQt5
+from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt, pyqtSignal, QModelIndex
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QTableView,
     QVBoxLayout,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
 )
-from PyQt5.QtGui import QIcon, QPixmap, QMouseEvent, QFont, QPalette, QColor
 
-from chimerax.core.commands import run, concise_model_spec
+# Relative
 from . import gaudireader
 
 

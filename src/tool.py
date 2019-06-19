@@ -1,38 +1,30 @@
-import sys
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Imports
+# Python
 import yaml
 import copy
+
+# ChimeraX
 from chimerax.core.tools import ToolInstance
 from chimerax.ui import MainToolWindow
 from chimerax.core.commands import run
-from PyQt5.QtCore import (
-    QAbstractTableModel,
-    QVariant,
-    Qt,
-    QSize,
-    pyqtSignal,
-    QTimer,
-    QModelIndex,
-)
+
+# PyQt5
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
-    QLabel,
     QLineEdit,
     QHBoxLayout,
     QVBoxLayout,
-    QGridLayout,
     QPushButton,
     QFileDialog,
     QWidget,
     QMessageBox,
-    QMenuBar,
-    QSplitter,
-    QFrame,
-    QGroupBox,
-    QCheckBox,
-    QButtonGroup,
 )
-from PyQt5 import QtGui
-from PyQt5.QtGui import QKeySequence
-from . import gui, gaudireader, toolbar
+
+# Relative
+from . import gui, toolbar
 
 
 class GaudiViewXTool(ToolInstance):
@@ -81,12 +73,12 @@ class GaudiViewXTool(ToolInstance):
 
             add_butn = QPushButton("Add...")
             add_butn.clicked.connect(self.add_new_data)
-            add_butn.setFont(QtGui.QFont("Helvetica", 11))
+            add_butn.setFont(QFont("Helvetica", 11))
             box_layout.addWidget(add_butn)
 
             self.delete_butn = QPushButton("Delete")
             self.delete_butn.setEnabled(False)
-            self.delete_butn.setFont(QtGui.QFont("Helvetica", 11))
+            self.delete_butn.setFont(QFont("Helvetica", 11))
             self.delete_butn.clicked.connect(self.remove_selected_rows)
 
             self.selection = self.table.selectionModel()
@@ -96,14 +88,13 @@ class GaudiViewXTool(ToolInstance):
 
             undo_butn = QPushButton("Undo")
             undo_butn.clicked.connect(self.undo)
-            undo_butn.setFont(QtGui.QFont("Helvetica", 11))
-            undo_butn.setShortcut(QKeySequence("Ctrl+Z"))
+            undo_butn.setFont(QFont("Helvetica", 11))
             box_layout.addWidget(undo_butn)
 
             box_layout.addSpacing(25)
 
             reset_butn = QPushButton("Reset")
-            reset_butn.setFont(QtGui.QFont("Helvetica", 11))
+            reset_butn.setFont(QFont("Helvetica", 11))
             reset_butn.setStyleSheet("color: rgb(206, 22,22);")
             reset_butn.clicked.connect(self.reset_changes)
             box_layout.addWidget(reset_butn)
@@ -148,7 +139,7 @@ class GaudiViewXTool(ToolInstance):
             options=options,
         )
         if name_file:
-            if gaudireader.equal_objectives(name_file) == self.table.tm.headerdata:
+            if equal_objectives(name_file) == self.table.tm.headerdata:
                 self.table.tm.gaudimain.add_gaudimodel(name_file)
                 self.table.tm.layoutAboutToBeChanged.emit()
                 self.table.tm.arraydata = (
@@ -224,11 +215,11 @@ class GaudiViewXTool(ToolInstance):
     def return_pressed(self):
         run(self.session, "%s" % self.line_edit.text())
 
-    def take_snapshot(self, session, flags):
-        return {"version": 1, "current text": self.line_edit.text()}
 
-    @classmethod
-    def restore_snapshot(class_obj, session, data):
-        inst = class_obj(session, "GaudiViewX")
-        inst.line_edit.setText(data["current text"])
-        return inst
+def equal_objectives(path):
+    with open(path, "r") as f:
+        data = yaml.safe_load(f)
+    header = ["Filename"] + list(
+        map(lambda text: text.split()[0], data["GAUDI.objectives"])
+    )
+    return header
