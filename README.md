@@ -21,7 +21,7 @@
 [![Documentation Status](https://readthedocs.org/projects/gaudiviewx/badge/?version=latest)](https://gaudiviewx.readthedocs.io/en/latest/?badge=latest)
 [![Python 3.6.8](https://img.shields.io/badge/python-3.6.8-blue.svg)](https://www.python.org/downloads/release/python-368/)
 [![](https://img.shields.io/github/license/andresginera/pgaudi.svg?color=orange)](http://www.apache.org/licenses/LICENSE-2.0)
-![](https://img.shields.io/static/v1.svg?label=platform&message=linux%20|%20osx&color=lightgrey)
+![](https://img.shields.io/static/v1.svg?label=platform&message=linux%20|%20osx%20|%20windows&color=lightgrey)
 
 GaudiViewX
 ==========
