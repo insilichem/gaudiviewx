@@ -157,10 +157,9 @@ class LogoCopyright(QHBoxLayout):
         logo.setCursor(Qt.PointingHandCursor)
         logo.setPixmap(
             QPixmap(
-                "/home/andres/practicas/chimerax/gaudiviewx/src/icons/insilichem.png"
+                ":/icons/insilichem.png"
             ).scaled(100, 87.5, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
-        logo.setAlignment(Qt.AlignCenter)
 
         return logo
 

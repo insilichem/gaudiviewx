@@ -5,6 +5,8 @@
 # Python
 import yaml
 import copy
+import os
+
 
 # ChimeraX
 from chimerax.core.tools import ToolInstance
@@ -12,6 +14,7 @@ from chimerax.ui import MainToolWindow
 from chimerax.core.commands import run
 
 # PyQt5
+from PyQt5.QtCore import QResource
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QLineEdit,
@@ -21,10 +24,15 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QWidget,
     QMessageBox,
+    QLabel,
 )
 
 # Relative
 from . import gui, toolbar
+
+QResource.registerResource(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources.rrc")
+)
 
 
 class GaudiViewXTool(ToolInstance):
@@ -106,11 +114,13 @@ class GaudiViewXTool(ToolInstance):
 
             self.command_layout = QHBoxLayout()
 
+            self.label = QLabel("Command:")
+            self.command_layout.addWidget(self.label)
             self.line_edit = QLineEdit()
             self.line_edit.setPlaceholderText("Command Input")
             self.line_edit.returnPressed.connect(self.return_pressed)
             self.command_layout.addWidget(self.line_edit)
-            main_layout.addSpacing(5)
+            self.command_layout.addSpacing(86)
 
             main_layout.addLayout(self.command_layout)
             main_layout.addSpacing(15)

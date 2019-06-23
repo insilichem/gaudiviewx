@@ -6,7 +6,7 @@ will be displayed without the ChimeraX- prefix.
 -->
 
 <BundleInfo name="ChimeraX-GaudiViewX"
-	    version="0.9" package="chimerax.gaudiviewx"
+	    version="1.0" package="chimerax.gaudiviewx"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
@@ -40,6 +40,17 @@ GaudiView to use the new UCSF ChimeraX for rendring the Gaudi solutions.
   <!-- Non-Python files that are part of package -->
   <DataFiles>
     <DataFile>docs/user/tools/guide.html</DataFile>
+    <DataFile>resources.rrc</DataFile>
+    <DataFile>icons/add.png</DataFile>
+    <DataFile>icons/arrows.png</DataFile>
+    <DataFile>icons/clustering.png</DataFile>
+    <DataFile>icons/cross.png</DataFile>
+    <DataFile>icons/filter.png</DataFile>
+    <DataFile>icons/help.png</DataFile>
+    <DataFile>icons/insilichem.png</DataFile>
+    <DataFile>icons/open.png</DataFile>
+    <DataFile>icons/reload.png</DataFile>
+    <DataFile>icons/save.png</DataFile>
   </DataFiles>
 
   <Classifiers>

@@ -11,7 +11,7 @@ from chimerax.core.geometry import align_points
 from chimerax.core.commands import run
 
 # PyQt5
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QResource
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QVBoxLayout,
@@ -37,6 +37,7 @@ from PyQt5.QtWidgets import (
 from . import gaudireader, gui
 
 
+
 class MyToolBar(QToolBar):
     def __init__(self, window, parent=None, *args):
         QToolBar.__init__(self, parent, *args)
@@ -44,13 +45,13 @@ class MyToolBar(QToolBar):
         self.window = window
         self.table = window.table
         self.session = window.session
-        self.addAction(QAction(QIcon("icon_folder"), "Open", self))
-        self.addAction(QAction(QIcon("icon_save"), "Save", self))
+        self.addAction(QAction(QIcon(":/icons/open.png"), "Open", self))
+        self.addAction(QAction(QIcon(":/icons/save.png"), "Save", self))
         self.addSeparator()
         self.addAction(
             QAction(
                 QIcon(
-                    "/home/andres/practicas/chimerax/gaudiviewx/src/icons/filter.png"
+                    ":/icons/filter.png"
                 ),
                 "Filter",
                 self,
@@ -59,7 +60,7 @@ class MyToolBar(QToolBar):
         self.addAction(
             QAction(
                 QIcon(
-                    "/home/andres/practicas/chimerax/gaudiviewx/src/icons/clustering.png"
+                    ":/icons/clustering.png"
                 ),
                 "Clustering",
                 self,
@@ -69,7 +70,7 @@ class MyToolBar(QToolBar):
         self.addSeparator()
         self.addAction(
             QAction(
-                QIcon("/home/andres/practicas/chimerax/gaudiviewx/src/icons/help.png"),
+                QIcon(":/icons/help.png"),
                 "Help",
                 self,
             )
@@ -84,15 +85,15 @@ class MyToolBar(QToolBar):
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
             filename, _ = QFileDialog.getSaveFileName(
-                QWidget(),
+                self,
                 "Save File",
                 "",
                 "Gaudi-Output Files (*.gaudi-output);;All Files (*)",
                 options=options,
             )
-            if not filename.endswith(".gaudi-output"):
-                filename += ".gaudi-output"
             if filename:
+                if not filename.endswith(".gaudi-output"):
+                    filename += ".gaudi-output"
                 self.table.tm.write_output(filename)
         elif action.text() == "Filter":
             FilterBox(self)
@@ -138,7 +139,7 @@ class FilterBox(QDialog):
         QDialog.__init__(self, parent, *args)
         self.setWindowTitle("Filtering")
         self.setWindowIcon(
-            QIcon("/home/andres/practicas/chimerax/gaudiviewx/src/icons/filter.png")
+            QIcon(":/icons/filter.png")
         )
 
         self.setFixedSize(self.minimumSize())
@@ -168,7 +169,7 @@ class FilterBox(QDialog):
 
         self.add_button = QPushButton()
         self.add_button.setIcon(
-            QIcon("/home/andres/practicas/chimerax/gaudiviewx/src/icons/add.png")
+            QIcon(":/icons/add.png")
         )
         self.add_button.setFixedHeight(30)
         self.add_button.clicked.connect(self.add_one)
@@ -349,7 +350,7 @@ class FilterCondition(QFrame):
             self.remove_button = QCancelBotton(self)
             self.remove_button.setToolTip("Remove conditional")
             icono = QPixmap(
-                "/home/andres/practicas/chimerax/gaudiviewx/src/icons/cross.png"
+                ":/icons/cross.png"
             ).scaled(15, 15, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.remove_button.setPixmap(icono)
 
@@ -384,7 +385,7 @@ class ToogleAndOr(QPushButton):
         self.setStyleSheet("color: blue")
         self.clicked.connect(self.change)
         self.setIcon(
-            QIcon("/home/andres/practicas/chimerax/gaudiviewx/src/icons/reload.png")
+            QIcon(":/icons/reload.png")
         )
         self.setFixedWidth(70)
 
@@ -439,6 +440,9 @@ class ClusteringBox(QDialog):
     def __init__(self, toolbar, parent=None, *args):
         QDialog.__init__(self, parent, *args)
         self.setWindowTitle("Clustering")
+        self.setWindowIcon(
+            QIcon(":/icons/clustering.png")
+        )
         self.toolbar = toolbar
         self.obj_sel = self.toolbar.table.tm.headerdata[self.toolbar.table.tm.ncol]
         self.order = self.toolbar.table.tm.order
@@ -569,11 +573,6 @@ class ClusteringBox(QDialog):
                         row.insert(index_cluster, index + 1)
 
         self.toolbar.table.tm.layoutChanged.emit()
-        if self.toolbar.table.selectionModel().hasSelection():
-            for index in self.toolbar.table.selectionModel().selection().indexes():
-                if index.data() in self.toolbar.table.tm.gaudimain.models:
-                    model = self.toolbar.table.tm.gaudimain.models[index.data()]
-                    gaudireader.hide(self.toolbar.session, model)
 
         progress.close()
         self.hide()
@@ -614,7 +613,7 @@ class ToogleBar(QHBoxLayout):
         icon = ToogleIcon(bar=self)
         icon.setCursor(Qt.PointingHandCursor)
         icon.setPixmap(
-            QPixmap("arrows.png").scaled(
+            QPixmap(":/icons/arrows.png").scaled(
                 20, 20, Qt.KeepAspectRatio, Qt.SmoothTransformation
             )
         )

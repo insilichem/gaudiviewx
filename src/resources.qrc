@@ -1,0 +1,15 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/add.png</file>
+    <file>icons/clustering.png</file>
+    <file>icons/cross.png</file>
+    <file>icons/filter.png</file>
+    <file>icons/help.png</file>
+    <file>icons/insilichem.png</file>
+    <file>icons/open.png</file>
+    <file>icons/reload.png</file>
+    <file>icons/save.png</file>
+    <file>icons/arrows.png</file>
+</qresource>
+</RCC>
+
