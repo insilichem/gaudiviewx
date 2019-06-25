@@ -117,13 +117,14 @@ class GaudiViewXTool(ToolInstance):
             self.label = QLabel("Command:")
             self.command_layout.addWidget(self.label)
             self.line_edit = QLineEdit()
-            self.line_edit.setPlaceholderText("Command Input")
+            self.line_edit.setPlaceholderText("It will be applied to all solutions")
             self.line_edit.returnPressed.connect(self.return_pressed)
             self.command_layout.addWidget(self.line_edit)
             self.command_layout.addSpacing(86)
 
+            main_layout.addSpacing(10)
             main_layout.addLayout(self.command_layout)
-            main_layout.addSpacing(15)
+            main_layout.addSpacing(10)
 
             main_layout.addLayout(gui.LogoCopyright())
 
