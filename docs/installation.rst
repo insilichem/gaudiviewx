@@ -10,3 +10,5 @@ After the ChimeraX installation, download the `GaudiViewX bundle <https://github
 .. code-block:: bash
 
     toolshed install path/to/bundle.whl
+    
+.. warning:: It has been reported an error in the installation for versions older than the 21\ :superscript:`th` of June version.
