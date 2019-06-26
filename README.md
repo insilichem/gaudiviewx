@@ -52,7 +52,7 @@ Features
 Documentation
 -------------
 
-The documentation of the program is stored in the `docs/` directory and also it is available in [readthedocs](https://gaudiviewx.readthedocs.io/en/latest/).
+The documentation of the program is stored in the [`docs/`](https://github.com/andresginera/gaudiviewx/tree/master/docs) directory and also it is available in [readthedocs](https://gaudiviewx.readthedocs.io/en/latest/).
 
 License
 -------
