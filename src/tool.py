@@ -120,7 +120,6 @@ class GaudiViewXTool(ToolInstance):
             self.line_edit.setPlaceholderText("It will be applied to all solutions")
             self.line_edit.returnPressed.connect(self.return_pressed)
             self.command_layout.addWidget(self.line_edit)
-            self.command_layout.addSpacing(86)
 
             main_layout.addSpacing(10)
             main_layout.addLayout(self.command_layout)
