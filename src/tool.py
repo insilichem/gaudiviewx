@@ -1,12 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+##############
+#   GaudiViewX: UCSF ChimeraX extension to
+#   explore and analyze GaudiMM solutions
+
+#   https://github.com/insilichem/gaudiviewx
+
+#   Copyright 2019 Andrés Giner Antón, Jaime Rodriguez-Guerra
+#   and Jean-Didier Marechal
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#        http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+##############
+
 # Imports
 # Python
 import yaml
 import copy
 import os
-
 
 # ChimeraX
 from chimerax.core.tools import ToolInstance
@@ -30,6 +51,7 @@ from PyQt5.QtWidgets import (
 # Relative
 from . import gui, toolbar
 
+# Resource
 QResource.registerResource(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources.rrc")
 )
@@ -81,12 +103,12 @@ class GaudiViewXTool(ToolInstance):
 
             add_butn = QPushButton("Add...")
             add_butn.clicked.connect(self.add_new_data)
-            add_butn.setFont(QFont("Helvetica", 11))
+            add_butn.setFont(QFont("Helvetica", 12))
             box_layout.addWidget(add_butn)
 
             self.delete_butn = QPushButton("Delete")
             self.delete_butn.setEnabled(False)
-            self.delete_butn.setFont(QFont("Helvetica", 11))
+            self.delete_butn.setFont(QFont("Helvetica", 12))
             self.delete_butn.clicked.connect(self.remove_selected_rows)
 
             self.selection = self.table.selectionModel()
@@ -96,13 +118,13 @@ class GaudiViewXTool(ToolInstance):
 
             undo_butn = QPushButton("Undo")
             undo_butn.clicked.connect(self.undo)
-            undo_butn.setFont(QFont("Helvetica", 11))
+            undo_butn.setFont(QFont("Helvetica", 12))
             box_layout.addWidget(undo_butn)
 
             box_layout.addSpacing(25)
 
-            reset_butn = QPushButton("Reset")
-            reset_butn.setFont(QFont("Helvetica", 11))
+            reset_butn = QPushButton("RESET")
+            reset_butn.setFont(QFont("Helvetica", 12))
             reset_butn.setStyleSheet("color: rgb(206, 22,22);")
             reset_butn.clicked.connect(self.reset_changes)
             box_layout.addWidget(reset_butn)
