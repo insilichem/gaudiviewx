@@ -52,7 +52,7 @@ Features
 Documentation
 -------------
 
-The documentation of the program is stored in the [`docs/`](https://github.com/andresginera/gaudiviewx/tree/master/docs) directory and also it is available in [readthedocs](https://gaudiviewx.readthedocs.io/en/latest/).
+The documentation of the program is stored in the [`docs/`](https://github.com/insilichem/gaudiviewx/tree/master/docs) directory and also it is available in [readthedocs](https://gaudiviewx.readthedocs.io/en/latest/).
 
 License
 -------
@@ -64,4 +64,4 @@ Citation
 
 Citation section.
 
-For contact us, please, use the email andresgineranton@outlook.com, or the [issues section](https://github.com/andresginera/gaudiviewx/issues) of this repository. 
+For contact us, please, use the email andresgineranton@outlook.com, or the [issues section](https://github.com/insilichem/gaudiviewx/issues) of this repository. 
