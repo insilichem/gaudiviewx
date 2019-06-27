@@ -139,7 +139,9 @@ class GaudiViewXTool(ToolInstance):
             self.label = QLabel("Command:")
             self.command_layout.addWidget(self.label)
             self.line_edit = QLineEdit()
-            self.line_edit.setPlaceholderText("It will be applied to all solutions")
+            self.line_edit.setPlaceholderText(
+                "It will be applied every time you select a new solution"
+            )
             self.line_edit.returnPressed.connect(self.return_pressed)
             self.command_layout.addWidget(self.line_edit)
 
