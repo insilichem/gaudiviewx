@@ -11,4 +11,4 @@ After the ChimeraX installation, download the `GaudiViewX bundle <https://github
 
     toolshed install path/to/bundle.whl
     
-.. warning:: It has been reported an error in the installation for versions older than the 21\ :superscript:`th` of June version.
+.. warning:: It has been reported an error in the installation for ChimeraX versions' older than the June, 21\ :superscript:`th` version.
