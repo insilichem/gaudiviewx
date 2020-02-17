@@ -76,12 +76,7 @@ class GaudiModel(object):
             ]
             models = []
             for mol2_file in mol2:
-                if "Protein" in mol2_file:
-                    mol2_name = "Protein_" + name
-                elif "Metal" in mol2_file:
-                    mol2_name = "Metal_" + name
-                elif "Ligand" in mol2_file:
-                    mol2_name = "Ligand_" + name
+                mol2_name = mol2_file.split("_")[0] + "_" + name
                 model, _ = io.open_data(
                     self.session, mol2_file, format=None, name=mol2_name
                 )
