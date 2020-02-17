@@ -71,12 +71,13 @@ class GaudiModel(object):
             z.extractall(tmp)
             mol2 = [
                 os.path.join(tmp, name)
+                zip_name = name
                 for name in z.namelist()
                 if name.endswith(".mol2")
             ]
             models = []
             for mol2_file in mol2:
-                mol2_name = mol2_file.split("_")[0] + "_" + name
+                mol2_name = zip_name.split("_")[0] + "_" + name
                 model, _ = io.open_data(
                     self.session, mol2_file, format=None, name=mol2_name
                 )
