@@ -76,7 +76,7 @@ class GaudiModel(object):
             ]
             models = []
             for mol2_file in mol2:
-                mol2_name = os.path.splitext(os.path.basename(path))[0].split("_")[0] + "_" + name
+                mol2_name = os.path.splitext(os.path.basename(mol2_file))[0].split("_")[0] + "_" + name
                 model, _ = io.open_data(
                     self.session, mol2_file, format=None, name=mol2_name
                 )
