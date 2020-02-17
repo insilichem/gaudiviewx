@@ -69,7 +69,6 @@ class GaudiModel(object):
             except OSError:
                 pass
             z.extractall(tmp)
-            zip_name = name
             mol2 = [
                 os.path.join(tmp, name)
                 for name in z.namelist()
@@ -77,7 +76,7 @@ class GaudiModel(object):
             ]
             models = []
             for mol2_file in mol2:
-                mol2_name = zip_name.split("_")[0] + "_" + name
+                mol2_name = os.path.splitext(os.path.basename(path))[0].split("_")[0] + "_" + name
                 model, _ = io.open_data(
                     self.session, mol2_file, format=None, name=mol2_name
                 )
