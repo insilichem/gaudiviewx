@@ -69,9 +69,9 @@ class GaudiModel(object):
             except OSError:
                 pass
             z.extractall(tmp)
+            zip_name = name
             mol2 = [
                 os.path.join(tmp, name)
-                zip_name = name
                 for name in z.namelist()
                 if name.endswith(".mol2")
             ]
